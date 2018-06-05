@@ -1,0 +1,11 @@
+<library path="lib/libleica_streaming_app_nodelet">
+
+    <class name="leica_streaming_app/leica_streaming_app_nodelet"
+           type="leica_streaming_app::LeicaStreamingAppNodelet"
+           base_class_type="nodelet::Nodelet">
+        <description>
+            Leica Streaming App Nodelet.
+        </description>
+    </class>
+
+</library>
