@@ -43,7 +43,8 @@ void LeicaStreamingAppNodelet::onInit() {
 void LeicaStreamingAppNodelet::connectCb() {
   if (!prism_pos_pub_ && prism_pos_pub_.getNumSubscribers() > 0) {
     NODELET_INFO("Connecting to odom/vicon position topic.");
-    pos_sub_ = nh_.subscribe("/vicon/position", 10, &LeicaStreamingAppNodelet::positionCb, this);
+    pos_sub_ = nh_.subscribe("/paintcopter/position", 10, &LeicaStreamingAppNodelet::positionCb, this);
+    start_stop_pub_ = nh_.subscribe("/leica/start_stop", 10, &LeicaStreamingAppNodelet::startStopCb, this);
   }
 }
 
@@ -51,6 +52,7 @@ void LeicaStreamingAppNodelet::disconnectCb() {
   if (prism_pos_pub_.getNumSubscribers() == 0) {
     NODELET_INFO("Unsubscribing from odom/vison position topic.");
     pos_sub_.shutdown();
+    start_stop_pub_.shutdown();
   }
 }
 
@@ -58,9 +60,17 @@ void LeicaStreamingAppNodelet::positionCb(const geometry_msgs::PointStamped::Con
   ts_.setPrismPosition(msg->point.x, msg->point.y, msg->point.z);
 }
 
+void LeicaStreamingAppNodelet::startStopCb(const std_msgs::Bool::ConstPtr& msg) {
+  if (msg->data) {
+    ts_.start();
+  } else {
+    ts_.end();
+  }
+}
+
 void LeicaStreamingAppNodelet::locationTSCallback(const double x,
-                                                           const double y,
-                                                           const double z) {
+                                                  const double y,
+                                                  const double z) {
   /*
   std::cout << "Prism is at x: " << x 
             << " y: " << y
@@ -68,11 +78,28 @@ void LeicaStreamingAppNodelet::locationTSCallback(const double x,
   std::cout << std::endl;
   */
   geometry_msgs::PointStamped msg;
+  msg.header.stamp = ros::Time::now();
   msg.point.x = x;
   msg.point.y = y;
   msg.point.z = z;
 
   prism_pos_pub_.publish(msg);
+
+  transformStamped_.header.stamp = ros::Time::now();
+  transformStamped_.header.frame_id = "world";
+  transformStamped_.child_frame_id = "leica_pos";
+  transformStamped_.transform.translation.x = x;
+  transformStamped_.transform.translation.y = y;
+  transformStamped_.transform.translation.z = z;
+
+  q_.setRPY(0, 0, 0);
+  transformStamped_.transform.rotation.x = q_.x();
+  transformStamped_.transform.rotation.y = q_.y();
+  transformStamped_.transform.rotation.z = q_.z();
+  transformStamped_.transform.rotation.w = q_.w();
+
+  br_.sendTransform(transformStamped_);
+
 }
 
 } // namespace leica_streaming_app

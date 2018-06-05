@@ -54,6 +54,8 @@
   <build_depend>geometry_msgs</build_depend>
   <build_depend>nodelet</build_depend>
   <build_depend>roslint</build_depend>
+  <build_depend>tf2</build_depend>
+  <build_depend>tf2_ros</build_depend>
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>std_msgs</build_export_depend>
   <build_export_depend>geometry_msgs</build_export_depend>
