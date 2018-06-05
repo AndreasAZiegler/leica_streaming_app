@@ -31,8 +31,6 @@ if(Boost_FOUND)
 endif()
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads REQUIRED)
-
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -142,7 +140,7 @@ include_directories(
 #   src/${PROJECT_NAME}/leica_streaming_app_interface.cpp
 # )
 add_library(leica_streaming_receiver SHARED src/tcp_total_station_interface.cpp)
-target_link_libraries(leica_streaming_receiver ${Boost_LIBRARIES} Threads::Threads)
+target_link_libraries(leica_streaming_receiver ${Boost_LIBRARIES})
 
 add_library(${PROJECT_NAME}_nodelet nodelets/leica_streaming_app_nodelet.cpp)
 target_link_libraries(leica_streaming_app_nodelet leica_streaming_receiver ${catkin_LIBRARIES})
