@@ -82,3 +82,7 @@ Interfaces the streaming app with a serial connection.
 * **`port`** (int, default: 5001)
 
 	The port number of the streaming app.
+
+* **`comport`** (string, default: "/dev/ttyUSB0")
+
+	The comport to which the total station is connected to.
