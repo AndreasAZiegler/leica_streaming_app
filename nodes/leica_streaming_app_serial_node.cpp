@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
   int port = 5001;
   */
 
-  ros::init(argc, argv, "leica_streaming_app_node");
+  ros::init(argc, argv, "leica_streaming_app_serial_node");
   nodelet::Loader nodelet;
   nodelet::M_string remap(ros::names::getRemappings());
   nodelet::V_string nargv;

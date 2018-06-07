@@ -11,7 +11,7 @@ g++ main.cpp -lboost_system -lboost_thread -lpthread -o leica_streaming_receiver
 #include "geometry_msgs/PointStamped.h"
 #include "nav_msgs/Odometry.h"
 
-#include "leica_streaming_app/leica_streaming_app_nodelet.h"
+#include "leica_streaming_app/leica_streaming_app_serial_nodelet.h"
 
 namespace leica_streaming_app {
 
@@ -53,7 +53,7 @@ void LeicaStreamingAppNodelet::disconnectCb() {
   if (prism_pos_pub_.getNumSubscribers() == 0) {
     NODELET_INFO("Unsubscribing from odom/vison position topic.");
     pos_sub_.shutdown();
-    start_stop_pub_.shutdown();
+    start_stop_sub_.shutdown();
   }
 }
 

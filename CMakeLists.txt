@@ -142,8 +142,11 @@ include_directories(
 add_library(leica_streaming_receiver SHARED src/tcp_total_station_interface.cpp)
 target_link_libraries(leica_streaming_receiver ${Boost_LIBRARIES})
 
-add_library(${PROJECT_NAME}_nodelet nodelets/leica_streaming_app_nodelet.cpp)
-target_link_libraries(leica_streaming_app_nodelet leica_streaming_receiver ${catkin_LIBRARIES})
+add_library(${PROJECT_NAME}_tcp_nodelet nodelets/leica_streaming_app_tcp_nodelet.cpp)
+target_link_libraries(${PROJECT_NAME}_tcp_nodelet leica_streaming_receiver ${catkin_LIBRARIES})
+
+add_library(${PROJECT_NAME}_serial_nodelet nodelets/leica_streaming_app_serial_nodelet.cpp)
+target_link_libraries(${PROJECT_NAME}_serial_nodelet leica_streaming_receiver ${catkin_LIBRARIES})
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -153,7 +156,8 @@ target_link_libraries(leica_streaming_app_nodelet leica_streaming_receiver ${cat
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(${PROJECT_NAME}_node nodes/leica_streaming_app_node.cpp)
+add_executable(${PROJECT_NAME}_tcp_node nodes/leica_streaming_app_tcp_node.cpp)
+add_executable(${PROJECT_NAME}_serial_node nodes/leica_streaming_app_serial_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -163,10 +167,14 @@ add_executable(${PROJECT_NAME}_node nodes/leica_streaming_app_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME}_tcp_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME}_serial_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME}_node
+target_link_libraries(${PROJECT_NAME}_tcp_node
+   ${catkin_LIBRARIES}
+)
+target_link_libraries(${PROJECT_NAME}_serial_node
    ${catkin_LIBRARIES}
 )
 
@@ -187,7 +195,7 @@ roslint_cpp()
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS ${PROJECT_NAME}_node ${PROJECT_NAME}_nodelet
+install(TARGETS ${PROJECT_NAME}_tcp_node ${PROJECT_NAME}_tcp_nodelet ${PROJECT_NAME}_serial_node ${PROJECT_NAME}_serial_nodelet
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

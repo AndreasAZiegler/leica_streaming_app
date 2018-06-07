@@ -20,7 +20,7 @@ class LeicaStreamingAppNodelet : public nodelet::Nodelet {
   virtual void onInit();
   void connectCb();
   void disconnectCb();
-  void positionCb(const geometry_msgs::PointStamped::ConstPtr& msg);
+  void positionCb(const nav_msgs::Odometry::ConstPtr& msg);
   void startStopCb(const std_msgs::Bool::ConstPtr& msg);
   void locationTSCallback(double x, double y, double z);
 
