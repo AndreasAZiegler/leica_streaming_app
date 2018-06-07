@@ -79,6 +79,7 @@ void LeicaStreamingAppNodelet::locationTSCallback(const double x,
   */
   geometry_msgs::PointStamped msg;
   msg.header.stamp = ros::Time::now();
+  msg.header.frame_id = "world";
   msg.point.x = x;
   msg.point.y = y;
   msg.point.z = z;
