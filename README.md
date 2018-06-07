@@ -30,16 +30,18 @@ To build from source, clone the latest version from this repository into your ca
 
 	cd catkin_workspace/src
 	git clone git@github.com:AndreasAZiegler/leica_streaming_app.git
-	git checkout serial
 	cd ../
 	catkin build leica_streaming_app
 
 
 ## Usage
 
-Run the main node with
+If you are connected to the total station with an Ethernet connection, run the main node with
 
 	rosrun leica_streaming_app leica_streaming_app_tcp_node _ip:="<IP address of the total station>" _port:=<port number of the streaming app>
+
+If you are connected to the total station with a serial connection, run the main node with
+
 	rosrun leica_streaming_app leica_streaming_app_serial_node _port:=<port number of the streaming app>
 
 ## Nodes
