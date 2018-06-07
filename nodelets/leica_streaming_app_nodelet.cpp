@@ -9,6 +9,7 @@ g++ main.cpp -lboost_system -lboost_thread -lpthread -o leica_streaming_receiver
 #include "ros/ros.h"
 #include "pluginlib/class_list_macros.h"
 #include "geometry_msgs/PointStamped.h"
+#include "nav_msgs/Odometry.h"
 
 #include "leica_streaming_app/leica_streaming_app_nodelet.h"
 
@@ -44,7 +45,7 @@ void LeicaStreamingAppNodelet::connectCb() {
   if (!prism_pos_pub_ && prism_pos_pub_.getNumSubscribers() > 0) {
     NODELET_INFO("Connecting to odom/vicon position topic.");
     pos_sub_ = nh_.subscribe("/paintcopter/position", 10, &LeicaStreamingAppNodelet::positionCb, this);
-    start_stop_pub_ = nh_.subscribe("/leica/start_stop", 10, &LeicaStreamingAppNodelet::startStopCb, this);
+    start_stop_sub_ = nh_.subscribe("/leica/start_stop", 10, &LeicaStreamingAppNodelet::startStopCb, this);
   }
 }
 
@@ -56,8 +57,8 @@ void LeicaStreamingAppNodelet::disconnectCb() {
   }
 }
 
-void LeicaStreamingAppNodelet::positionCb(const geometry_msgs::PointStamped::ConstPtr& msg) {
-  ts_.setPrismPosition(msg->point.x, msg->point.y, msg->point.z);
+void LeicaStreamingAppNodelet::positionCb(const nav_msgs::Odometry::ConstPtr& msg) {
+  ts_.setPrismPosition(msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z);
 }
 
 void LeicaStreamingAppNodelet::startStopCb(const std_msgs::Bool::ConstPtr& msg) {

@@ -27,7 +27,7 @@ class LeicaStreamingAppNodelet : public nodelet::Nodelet {
   ros::NodeHandle nh_;
   ros::NodeHandle private_nh_;
   ros::Subscriber pos_sub_;
-  ros::Subscriber start_stop_pub_;
+  ros::Subscriber start_stop_sub_;
   ros::Publisher prism_pos_pub_;
   tf2_ros::TransformBroadcaster br_;
   geometry_msgs::TransformStamped transformStamped_;
