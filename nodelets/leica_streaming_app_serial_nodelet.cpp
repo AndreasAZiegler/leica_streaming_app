@@ -15,18 +15,18 @@ g++ main.cpp -lboost_system -lboost_thread -lpthread -o leica_streaming_receiver
 
 namespace leica_streaming_app {
 
-LeicaStreamingAppNodelet::LeicaStreamingAppNodelet()
-  : ts_(std::bind(&LeicaStreamingAppNodelet::locationTSCallback,
+LeicaStreamingAppSerialNodelet::LeicaStreamingAppSerialNodelet()
+  : ts_(std::bind(&LeicaStreamingAppSerialNodelet::locationTSCallback,
                 this,
                 std::placeholders::_1,
                 std::placeholders::_2,
                 std::placeholders::_3)) {
 }
 
-LeicaStreamingAppNodelet::~LeicaStreamingAppNodelet() {
+LeicaStreamingAppSerialNodelet::~LeicaStreamingAppSerialNodelet() {
 }
 
-void LeicaStreamingAppNodelet::onInit() {
+void LeicaStreamingAppSerialNodelet::onInit() {
   nh_ = getNodeHandle();
   private_nh_ = getPrivateNodeHandle();
 
@@ -37,19 +37,19 @@ void LeicaStreamingAppNodelet::onInit() {
   ts_.connect(ip, port);
 
   prism_pos_pub_ = nh_.advertise<geometry_msgs::PointStamped>("/leica/position", 10,
-      boost::bind(&LeicaStreamingAppNodelet::connectCb, this),
-      boost::bind(&LeicaStreamingAppNodelet::disconnectCb, this));
+      boost::bind(&LeicaStreamingAppSerialNodelet::connectCb, this),
+      boost::bind(&LeicaStreamingAppSerialNodelet::disconnectCb, this));
 }
 
-void LeicaStreamingAppNodelet::connectCb() {
+void LeicaStreamingAppSerialNodelet::connectCb() {
   if (!prism_pos_pub_ && prism_pos_pub_.getNumSubscribers() > 0) {
     NODELET_INFO("Connecting to odom/vicon position topic.");
-    pos_sub_ = nh_.subscribe("/paintcopter/position", 10, &LeicaStreamingAppNodelet::positionCb, this);
-    start_stop_sub_ = nh_.subscribe("/leica/start_stop", 10, &LeicaStreamingAppNodelet::startStopCb, this);
+    pos_sub_ = nh_.subscribe("/paintcopter/position", 10, &LeicaStreamingAppSerialNodelet::positionCb, this);
+    start_stop_sub_ = nh_.subscribe("/leica/start_stop", 10, &LeicaStreamingAppSerialNodelet::startStopCb, this);
   }
 }
 
-void LeicaStreamingAppNodelet::disconnectCb() {
+void LeicaStreamingAppSerialNodelet::disconnectCb() {
   if (prism_pos_pub_.getNumSubscribers() == 0) {
     NODELET_INFO("Unsubscribing from odom/vison position topic.");
     pos_sub_.shutdown();
@@ -57,11 +57,11 @@ void LeicaStreamingAppNodelet::disconnectCb() {
   }
 }
 
-void LeicaStreamingAppNodelet::positionCb(const nav_msgs::Odometry::ConstPtr& msg) {
+void LeicaStreamingAppSerialNodelet::positionCb(const nav_msgs::Odometry::ConstPtr& msg) {
   ts_.setPrismPosition(msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z);
 }
 
-void LeicaStreamingAppNodelet::startStopCb(const std_msgs::Bool::ConstPtr& msg) {
+void LeicaStreamingAppSerialNodelet::startStopCb(const std_msgs::Bool::ConstPtr& msg) {
   if (msg->data) {
     ts_.start();
   } else {
@@ -69,7 +69,7 @@ void LeicaStreamingAppNodelet::startStopCb(const std_msgs::Bool::ConstPtr& msg) 
   }
 }
 
-void LeicaStreamingAppNodelet::locationTSCallback(const double x,
+void LeicaStreamingAppSerialNodelet::locationTSCallback(const double x,
                                                   const double y,
                                                   const double z) {
   /*
@@ -105,4 +105,4 @@ void LeicaStreamingAppNodelet::locationTSCallback(const double x,
 }
 
 } // namespace leica_streaming_app
-PLUGINLIB_DECLARE_CLASS(leica_streaming_app, LeicaStreamingAppNodelet, leica_streaming_app::LeicaStreamingAppNodelet, nodelet::Nodelet);
+PLUGINLIB_DECLARE_CLASS(leica_streaming_app, LeicaStreamingAppSerialNodelet, leica_streaming_app::LeicaStreamingAppSerialNodelet, nodelet::Nodelet);

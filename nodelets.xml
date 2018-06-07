@@ -1,10 +1,22 @@
-<library path="lib/libleica_streaming_app_nodelet">
+<library path="lib/libleica_streaming_app_tcp_nodelet">
 
-    <class name="leica_streaming_app/leica_streaming_app_nodelet"
-           type="leica_streaming_app::LeicaStreamingAppNodelet"
+    <class name="leica_streaming_app/leica_streaming_app_tcp_nodelet"
+           type="leica_streaming_app::LeicaStreamingAppTCPNodelet"
            base_class_type="nodelet::Nodelet">
         <description>
-            Leica Streaming App Nodelet.
+            Leica Streaming App TCP Nodelet.
+        </description>
+    </class>
+
+</library>
+
+<library path="lib/libleica_streaming_app_serial_nodelet">
+
+    <class name="leica_streaming_app/leica_streaming_app_serial_nodelet"
+           type="leica_streaming_app::LeicaStreamingAppSerialNodelet"
+           base_class_type="nodelet::Nodelet">
+        <description>
+            Leica Streaming App serial Nodelet.
         </description>
     </class>
 

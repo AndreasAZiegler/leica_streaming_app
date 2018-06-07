@@ -11,10 +11,10 @@
 
 namespace leica_streaming_app {
 
-class LeicaStreamingAppNodelet : public nodelet::Nodelet {
+class LeicaStreamingAppSerialNodelet : public nodelet::Nodelet {
  public:
-  LeicaStreamingAppNodelet();
-  ~LeicaStreamingAppNodelet();
+  LeicaStreamingAppSerialNodelet();
+  ~LeicaStreamingAppSerialNodelet();
 
  private:
   virtual void onInit();
