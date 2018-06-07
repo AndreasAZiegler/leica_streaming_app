@@ -7,7 +7,7 @@
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_ros/transform_broadcaster.h"
 
-#include "leica_streaming_app/tcp_total_station_interface.h"
+#include "leica_streaming_app/serial_total_station_interface.h"
 
 namespace leica_streaming_app {
 
@@ -33,6 +33,6 @@ class LeicaStreamingAppNodelet : public nodelet::Nodelet {
   geometry_msgs::TransformStamped transformStamped_;
   tf2::Quaternion q_;
 
-  TCPTSInterface ts_;
+  SerialTSInterface ts_;
 };
 } // namespace leia_streaming_app
