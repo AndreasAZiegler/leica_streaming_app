@@ -30,11 +30,9 @@ void LeicaStreamingAppSerialNodelet::onInit() {
   nh_ = getNodeHandle();
   private_nh_ = getPrivateNodeHandle();
 
-  std::string ip;
-  int port;
-  private_nh_.param<std::string>("ip", ip, "10.2.86.54");
-  private_nh_.param("port", port, 5001);
-  ts_.connect(ip, port);
+  std::string comport;
+  private_nh_.param<std::string>("comport", comport, "/dev/ttyUSB0");
+  ts_.connect(comport);
 
   prism_pos_pub_ = nh_.advertise<geometry_msgs::PointStamped>("/leica/position", 10,
       boost::bind(&LeicaStreamingAppSerialNodelet::connectCb, this),
