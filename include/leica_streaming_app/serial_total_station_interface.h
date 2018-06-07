@@ -49,7 +49,7 @@ class SerialTSInterface: public TSInterface {
    * @param ip The ip address as std::string
    * @param port The port number as int
    */
-  void connect(std::string ip, int port);
+  void connect(std::string comport);
 
   /**
    * @brief Sends the start command to the total station.
