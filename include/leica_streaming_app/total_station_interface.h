@@ -61,6 +61,11 @@ class TSInterface {
    */
   void searchPrism(void);
 
+  /**
+   * @brief Turn total station to the position received externally.
+   */
+  void turnTelescope(void);
+
   TSState tsState_;                                       /**< State of the total station */
 
   std::vector<double> prismPosition_;                     /**< Position of the prism given bei Rovio or Vicon */
@@ -76,6 +81,9 @@ class TSInterface {
 
   bool searchingPrismFlag_;                               /**< Flag indicating that the total station searches the prism */
   std::mutex searchingPrismMutex_;                        /**< Mutex for the corresponding flag */
+
+  bool externalPositionReceivedFlag_;                     /**< Flag indicating if a recent position was received externally */
+  std::mutex externalPositionReceivedMutex_;              /**< Mutex for the corresponding flag */
 
   std::function<void(const double, const double, const double)> locationCallback_; /**< Function pointer for the callback function */
 };
