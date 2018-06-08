@@ -8,21 +8,16 @@
 #include <iostream>
 #include <string>
 #include <thread>
+#include <vector>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include "leica_streaming_app/tcp_total_station_interface.h"
 
 TCPTSInterface::TCPTSInterface(std::function<void(const double, const double, const double)> locationCallback)
-  : io_context_(new boost::asio::io_service()),
-    socket_(new boost::asio::ip::tcp::socket(*io_context_)),
-    locationCallback_(locationCallback),
-    timer_(*io_context_, boost::posix_time::seconds(2)),
-    timerStartedFlag_(false),
-    searchingPrismFlag_(false),
-    tsState_(TSState::on),
-    prismPosition_(3),
-    TSInterface() {}
+  : socket_(new boost::asio::ip::tcp::socket(*io_context_)),
+    TSInterface(locationCallback) {}
 
 TCPTSInterface::~TCPTSInterface() {
   socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
@@ -50,24 +45,6 @@ void TCPTSInterface::connect(std::string ip, int port) {
   }
 }
 
-void TCPTSInterface::start() {
-  std::vector<char> command{'%', 'R', '8', 'Q', ',', '1', ':', 0x0d/*CR*/, 0x0a/*LF*/};
-  write(command);
-  tsState_ = TSState::on;
-}
-
-void TCPTSInterface::end() {
-  std::vector<char> command {'%', 'R', '8', 'Q', ',', '2', ':', 0x0d/*CR*/, 0x0a/*LF*/};
-  write(command);
-  tsState_ = TSState::off;
-}
-
-void TCPTSInterface::setPrismPosition(double x, double y, double z) {
-  prismPosition_[0] = x;
-  prismPosition_[1] = y;
-  prismPosition_[2] = z;
-}
-
 void TCPTSInterface::startReader() {
   boost::asio::async_read_until(*socket_,
                                 readData_,
@@ -89,10 +66,11 @@ void TCPTSInterface::write(std::vector<char> command) {
                           );
 }
 
-void TCPTSInterface::startTimer() {
-  std::cout << "Start timer" << std::endl;
-  timer_.expires_at(timer_.expires_at() + boost::posix_time::seconds(2));
-  timer_.async_wait(std::bind(&TCPTSInterface::timerHandler, this));
+void TCPTSInterface::writeHandler(const boost::system::error_code& ec,
+                                  std::size_t bytes_transferred) {
+  if (!ec) {
+    std::cout << "Command sent." << std::endl;
+  }
 }
 
 void TCPTSInterface::readHandler(const boost::system::error_code& ec,
@@ -106,15 +84,14 @@ void TCPTSInterface::readHandler(const boost::system::error_code& ec,
     readData_.consume(bytes_transferred);
 
     // Print received message
-    //std::cout << data << std::endl;
+    // std::cout << data << std::endl;
 
-    
     // Check for responses if the total station searches the prism
     if (searchingPrismFlag_) {
       // Catch the response
       if (data.find("%R8P,0,0:") != std::string::npos) {
         std::cout << "Got an answer." << std::endl;
-        
+
         // Catch the negative response
         if (data.find(":31") != std::string::npos) {
           std::cout << "Prism not found!" << std::endl;
@@ -163,42 +140,4 @@ void TCPTSInterface::readHandler(const boost::system::error_code& ec,
                                             std::placeholders::_2)
                                  );
   }
-}
-
-void TCPTSInterface::writeHandler(const boost::system::error_code& ec,
-                                  std::size_t bytes_transferred) {
-  if (!ec) {
-    std::cout << "Command sent." << std::endl;
-  }
-}
-
-void TCPTSInterface::timerHandler() {
-  {
-    if (TSState::on == tsState_) {
-      // Check if a message was received since last time.
-      std::lock_guard<std::mutex> guard1(messageReceivedMutex_);
-      std::lock_guard<std::mutex> guard2(searchingPrismMutex_);
-
-      // Start to search the prism if no message was received
-      if (!messagesReceivedFlag_ && !searchingPrismFlag_) {
-        std::cout << "Prism lost!" << std::endl;
-        searchPrism();
-      }
-
-      // Reset flag
-      messagesReceivedFlag_ = false;
-    }
-  }
-
-  // Restart timer
-  timer_.expires_at(timer_.expires_at() + boost::posix_time::milliseconds(800));
-  timer_.async_wait(std::bind(&TCPTSInterface::timerHandler, this));
-}
-
-void TCPTSInterface::searchPrism(void) {
-  searchingPrismFlag_ = true;
-  std::vector<char> command {'%', 'R', '8', 'Q', ',', '6', ':', '1', 0x0d/*CR*/, 0x0a/*LF*/};
-  write(command);
-
-  std::cout << "Search prism" << std::endl;
 }
